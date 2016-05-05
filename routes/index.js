@@ -20,34 +20,41 @@ var isAuthenticated = function (req, res, next) {
 
 module.exports = function(passport) {
 
-	/* GET login page. */
+	/* GET index page. */
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
 		res.render('index', { message: req.flash('message') });
 	});
 
+	/* GET login page. */
+	router.get('/login', function(req, res) {
+    	// Display the Login page with any flash message, if any
+		res.render('login', { message: req.flash('message') });
+	});
+
+
 	/* Handle Login POST */
 	router.post('/login', passport.authenticate('login', {
-		successRedirect: '/home',
-		failureRedirect: '/',
+		successRedirect: '/profile',
+		failureRedirect: '/login',
 		failureFlash : true  
 	}));
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
-		res.render('register',{message: req.flash('message')});
+		res.render('signup',{message: req.flash('message')});
 	});
 
 	/* Handle Registration POST */
 	router.post('/signup', passport.authenticate('signup', {
-		successRedirect: '/home',
+		successRedirect: '/profile',
 		failureRedirect: '/signup',
 		failureFlash : true  
 	}));
 
-	/* GET Home Page */
-	router.get('/home', isAuthenticated, function(req, res){
-		res.render('home', { user: req.user });
+	/* GET Profile Page */
+	router.get('/profile', isAuthenticated, function(req, res){
+		res.render('profile', { user: req.user });
 	});
 
 	/* Handle Logout */
@@ -65,7 +72,20 @@ module.exports = function(passport) {
 	// handle the callback after facebook has authenticated the user
 	router.get('/login/facebook/callback',
 		passport.authenticate('facebook', {
-			successRedirect : '/home',
+			successRedirect : '/profile',
+			failureRedirect : '/'
+		})
+	);
+	
+	// route for linkedin authentication and login
+	// different scopes while logging in
+	router.get('/login/linkedin', 
+		passport.authenticate('linkedin'));
+
+	// handle the callback after facebook has authenticated the user
+	router.get('/login/linkedin/callback',
+		passport.authenticate('linkedin', {
+			successRedirect : '/profile',
 			failureRedirect : '/'
 		})
 	);
